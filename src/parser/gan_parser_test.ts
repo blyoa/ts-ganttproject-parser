@@ -145,6 +145,7 @@ describe("parseGanttProjectXML", () => {
         name: "task",
         startDate: new Date(Date.UTC(2024, 0, 4)),
         durationInDays: 2,
+        endDate: new Date(Date.UTC(2024, 0, 5)),
         completionPercentage: 0,
         isExpanded: true,
 
@@ -439,6 +440,109 @@ describe("parseGanttProjectXML", () => {
 
       expect(project.taskSet.tasks[4].name).toBe("task E");
       expect(project.taskSet.tasks[4].dependencies).toHaveLength(0);
+    });
+
+    describe("`endDate` calculation", () => {
+      describe("crossing a holiday", () => {
+        it("a off holiday is crossed; endDate = startDate + (durationInDays - 1) days + 1 days", async () => {
+          const text = await Deno.readTextFile(
+            `${testDataDir}/task/endDate/task-crossing-one-off-holiday.gan`,
+          );
+          const project = parseGanttProjectXML(text);
+
+          expect(project.taskSet.tasks).toHaveLength(1);
+          expect(project.taskSet.tasks[0].name).toBe("task");
+          expect(project.taskSet.tasks[0].isMilestone).toBe(false);
+
+          expect(project.taskSet.tasks[0].startDate).toEqual(
+            new Date(Date.UTC(2024, 0, 2)),
+          );
+          expect(project.taskSet.tasks[0].durationInDays).toBe(2);
+          expect(project.taskSet.tasks[0].endDate).toEqual(
+            new Date(Date.UTC(2024, 0, 4)),
+          );
+        });
+
+        it("a recurring holiday is crossed; endDate = startDate + (durationInDays - 1) days + 1 days", async () => {
+          const text = await Deno.readTextFile(
+            `${testDataDir}/task/endDate/task-crossing-recurring-holiday.gan`,
+          );
+          const project = parseGanttProjectXML(text);
+
+          expect(project.taskSet.tasks).toHaveLength(1);
+          expect(project.taskSet.tasks[0].name).toBe("task");
+          expect(project.taskSet.tasks[0].isMilestone).toBe(false);
+
+          expect(project.taskSet.tasks[0].startDate).toEqual(
+            new Date(Date.UTC(2024, 0, 2)),
+          );
+          expect(project.taskSet.tasks[0].durationInDays).toBe(2);
+          expect(project.taskSet.tasks[0].endDate).toEqual(
+            new Date(Date.UTC(2024, 0, 4)),
+          );
+        });
+      });
+
+      describe("crossing weekends", () => {
+        it("two weekends are crossed and tasks are not runnable on weekends; endDate = startDate + (durationInDays - 1) days + 2 days", async () => {
+          const text = await Deno.readTextFile(
+            `${testDataDir}/task/endDate/task-crossing-weekends-and-no-tasks-can-run-on-weekends.gan`,
+          );
+          const project = parseGanttProjectXML(text);
+
+          expect(project.taskSet.tasks).toHaveLength(1);
+          expect(project.taskSet.tasks[0].name).toBe("task");
+          expect(project.taskSet.tasks[0].isMilestone).toBe(false);
+
+          expect(project.taskSet.tasks[0].startDate).toEqual(
+            new Date(Date.UTC(2023, 11, 29)),
+          );
+          expect(project.taskSet.tasks[0].durationInDays).toBe(2);
+          expect(project.taskSet.tasks[0].endDate).toEqual(
+            new Date(Date.UTC(2024, 0, 1)),
+          );
+        });
+
+        it("two weekends are crossed but tasks are runnable on weekends; endDate = startDate + (durationInDays - 1) days", async () => {
+          const text = await Deno.readTextFile(
+            `${testDataDir}/task/endDate/task-crossing-weekends-and-tasks-can-run-on-weekends.gan`,
+          );
+          const project = parseGanttProjectXML(text);
+
+          expect(project.taskSet.tasks).toHaveLength(1);
+          expect(project.taskSet.tasks[0].name).toBe("task");
+          expect(project.taskSet.tasks[0].isMilestone).toBe(false);
+
+          expect(project.taskSet.tasks[0].startDate).toEqual(
+            new Date(Date.UTC(2023, 11, 29)),
+          );
+          expect(project.taskSet.tasks[0].durationInDays).toBe(2);
+          expect(project.taskSet.tasks[0].endDate).toEqual(
+            new Date(Date.UTC(2023, 11, 30)),
+          );
+        });
+      });
+
+      describe("milestone", () => {
+        it("the end date of a milestone should be same as startDate", async () => {
+          const text = await Deno.readTextFile(
+            `${testDataDir}/task/milestone-task.gan`,
+          );
+          const project = parseGanttProjectXML(text);
+
+          expect(project.taskSet.tasks).toHaveLength(1);
+          expect(project.taskSet.tasks[0].name).toBe("milestone");
+          expect(project.taskSet.tasks[0].isMilestone).toBe(true);
+
+          expect(project.taskSet.tasks[0].startDate).toEqual(
+            new Date(Date.UTC(2024, 0, 2)),
+          );
+          expect(project.taskSet.tasks[0].durationInDays).toBe(0);
+          expect(project.taskSet.tasks[0].endDate).toEqual(
+            new Date(Date.UTC(2024, 0, 2)),
+          );
+        });
+      });
     });
   });
 

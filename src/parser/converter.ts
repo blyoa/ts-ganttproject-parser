@@ -51,6 +51,7 @@ import type {
   View,
 } from "./elem_types.ts";
 import { TaskPriorityType } from "./elem_types.ts";
+import { addWorkdays } from "./date.ts";
 
 function convertToField(xmlField: XMLFieldOutput): Field {
   return {
@@ -159,7 +160,7 @@ function convertToCustomProperty(
   };
 }
 
-function convertToTask(xmlTask: XMLTaskOutput): Task {
+function convertToTask(xmlTask: XMLTaskOutput, calendar: Calendar): Task {
   const startDate = xmlTask["@_start"];
   const durationInDays = xmlTask["@_duration"];
 
@@ -172,6 +173,7 @@ function convertToTask(xmlTask: XMLTaskOutput): Task {
     isMilestone: xmlTask["@_meeting"],
     isProjectTask: !!xmlTask["@_project"],
     startDate,
+    endDate: addWorkdays(startDate, durationInDays - 1, calendar),
     durationInDays,
     completionPercentage: xmlTask["@_complete"],
     earliestStartDate: xmlTask["@_thirdDate"],
@@ -184,19 +186,20 @@ function convertToTask(xmlTask: XMLTaskOutput): Task {
     notes: xmlTask.notes,
     dependencies: xmlTask.depend?.map(convertToDependency) ?? [],
     customProperties: xmlTask.customproperty.map(convertToCustomProperty),
-    subtasks: xmlTask.task?.map((st) => convertToTask(st)) ?? [],
+    subtasks: xmlTask.task?.map((st) => convertToTask(st, calendar)) ?? [],
     legacyFixedStart: xmlTask["@_fixed-start"],
   };
 }
 
 function convertToTaskSet(
   xmlTaskSet: XMLTaskSetOutput,
+  calendar: Calendar,
 ): TaskSet {
   return {
     allowEmptyMilestones: xmlTaskSet["@_empty-milestones"],
     taskProperties:
       xmlTaskSet.taskproperties?.taskproperty?.map(convertToTaskProperty) ?? [],
-    tasks: xmlTaskSet.task?.map((task) => convertToTask(task)) ?? [],
+    tasks: xmlTaskSet.task?.map((task) => convertToTask(task, calendar)) ?? [],
   };
 }
 
@@ -320,7 +323,7 @@ export function convertToProject(xmlProject: XMLProjectOutput): Project {
     description: xmlProject.description,
     views: xmlProject.view.map(convertToView),
     calendar,
-    taskSet: convertToTaskSet(xmlProject.tasks),
+    taskSet: convertToTaskSet(xmlProject.tasks, calendar),
     resourceSet: xmlProject.resources
       ? convertToResourceSet(xmlProject.resources)
       : { propertyDefinitions: [], resources: [] },

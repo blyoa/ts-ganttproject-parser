@@ -118,6 +118,7 @@ export type Task = {
   isMilestone: boolean;
   isProjectTask: boolean;
   startDate: Date;
+  endDate: Date;
   durationInDays: number;
   completionPercentage: number;
   earliestStartDate?: Date;
@@ -190,6 +191,7 @@ export type Vacation = {
 export type BaselineTask = {
   id: number;
   startDate: Date;
+  endDate: Date;
   durationInDays: number;
   isMilestone: boolean;
   isSummary: boolean;
