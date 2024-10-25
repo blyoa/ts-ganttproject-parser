@@ -276,20 +276,31 @@ function convertToVacation(xmlVacation: XMLVacationOutput): Vacation {
 
 function convertToBaselineTask(
   xmlBaselineTask: XMLBaselineTaskOutput,
+  calendar: Calendar,
 ): BaselineTask {
+  const startDate = xmlBaselineTask["@_start"];
+  const durationInDays = xmlBaselineTask["@_duration"];
+
   return {
     id: xmlBaselineTask["@_id"],
-    startDate: xmlBaselineTask["@_start"],
-    durationInDays: xmlBaselineTask["@_duration"],
+    startDate,
+    endDate: addWorkdays(startDate, durationInDays - 1, calendar),
+    durationInDays,
     isMilestone: xmlBaselineTask["@_meeting"],
     isSummary: xmlBaselineTask["@_super"],
   };
 }
 
-function convertToBaseline(xmlBaseline: XMLBaselineOutput): Baseline {
+function convertToBaseline(
+  xmlBaseline: XMLBaselineOutput,
+  calendar: Calendar,
+): Baseline {
   return {
     name: xmlBaseline["@_name"],
-    tasks: xmlBaseline["previous-task"]?.map(convertToBaselineTask) ?? [],
+    tasks:
+      xmlBaseline["previous-task"]?.map((bt) =>
+        convertToBaselineTask(bt, calendar)
+      ) ?? [],
   };
 }
 
@@ -330,8 +341,11 @@ export function convertToProject(xmlProject: XMLProjectOutput): Project {
     allocations: xmlProject.allocations?.allocation.map(convertToAllocation) ??
       [],
     vacations: xmlProject.vacations?.vacation.map(convertToVacation) ?? [],
-    baselines: xmlProject.previous?.["previous-tasks"].map(convertToBaseline) ??
-      [],
+    baselines:
+      xmlProject.previous?.["previous-tasks"].map((b) =>
+        convertToBaseline(b, calendar)
+      ) ??
+        [],
     roleSets: xmlProject.roles.map(convertToRoleSet),
   };
 }
