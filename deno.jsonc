@@ -1,4 +1,7 @@
 {
   "name": "@blyoa/ts-ganttproject-parser",
-  "version": "0.0.0"
+  "version": "0.0.0",
+  "imports": {
+    "@std/assert": "jsr:@std/assert@^1.0.8"
+  }
 }
