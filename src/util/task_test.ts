@@ -1,7 +1,7 @@
 import { beforeEach, describe, it } from "@std/testing/bdd";
 import { expect } from "@std/expect";
 
-import { walkTasksDepthFirst } from "./task.ts";
+import { collectTasksDepthFirst, walkTasksDepthFirst } from "./task.ts";
 import type { Project, Task } from "../parser/mod.ts";
 
 function createTask(name: string): Task {
@@ -118,5 +118,33 @@ describe("walkTasksDepthFirst", () => {
       { parentTask: "3", task: "4" },
       { parentTask: undefined, task: "5" },
     ]);
+  });
+});
+
+describe("collectTasksDepthFirst", () => {
+  it("should return an empty array if no task exists", () => {
+    project.taskSet.tasks = [];
+    expect(collectTasksDepthFirst(project)).toEqual([]);
+  });
+
+  it("should return tasks in depth-first order", () => {
+    project.taskSet.tasks = [
+      createTask("1"),
+      {
+        ...createTask("2"),
+        subtasks: [
+          {
+            ...createTask("3"),
+            subtasks: [
+              createTask("4"),
+            ],
+          },
+        ],
+      },
+      createTask("5"),
+    ];
+    expect(collectTasksDepthFirst(project).map((t) => t.name)).toEqual(
+      ["1", "2", "3", "4", "5"],
+    );
   });
 });

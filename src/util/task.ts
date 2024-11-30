@@ -36,3 +36,29 @@ export function walkTasksDepthFirst(
 
   walk(undefined, project.taskSet.tasks);
 }
+
+/**
+ * Collects all tasks from a project into a flat array in a depth-first order.
+ *
+ * @param project The project containing tasks to collect
+ * @returns An array containing all tasks in depth-first order
+ *
+ * This function uses {@link walkTasksDepthFirst} internally to traverse all tasks.
+ * The resulting array maintains the depth-first ordering, where a parent task is
+ * followed by all its subtasks before moving to the next sibling task.
+ *
+ * @example
+ * ```typescript
+ * const project = parseGanttProjectXML(xmlString);
+ * const allTasks = collectTasksDepthFirst(project);
+ * console.log(`the numer of tasks: ${allTasks.length}`);
+ * ```
+ */
+export function collectTasksDepthFirst(project: Project): Task[] {
+  const tasks: Task[] = [];
+  walkTasksDepthFirst(project, (_, t) => {
+    tasks.push(t);
+    return true;
+  });
+  return tasks;
+}
