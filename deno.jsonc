@@ -10,6 +10,7 @@
   },
   "exports": {
     ".": "./src/mod.ts",
-    "./parser": "./src/parser/mod.ts"
+    "./parser": "./src/parser/mod.ts",
+    "./util": "./src/util/mod.ts"
   }
 }
