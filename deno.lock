@@ -7,7 +7,8 @@
     "jsr:@std/fs@^1.0.5": "1.0.6",
     "jsr:@std/internal@^1.0.5": "1.0.5",
     "jsr:@std/path@^1.0.8": "1.0.8",
-    "jsr:@std/testing@^1.0.5": "1.0.5"
+    "jsr:@std/testing@^1.0.5": "1.0.5",
+    "npm:fast-xml-parser@^4.5.0": "4.5.0"
   },
   "jsr": {
     "@std/assert@1.0.8": {
@@ -49,11 +50,23 @@
       ]
     }
   },
+  "npm": {
+    "fast-xml-parser@4.5.0": {
+      "integrity": "sha512-/PlTQCI96+fZMAOLMZK4CWG1ItCbfZ/0jx7UIJFChPNrx7tcEgerUgWbeieCM9MfHInUDyK8DWYZ+YrywDJuTg==",
+      "dependencies": [
+        "strnum"
+      ]
+    },
+    "strnum@1.0.5": {
+      "integrity": "sha512-J8bbNyKKXl5qYcR36TIO8W3mVGVHrmmxsd5PAItGkmyzwJvybiw2IVq5nqd0i4LSNSkB/sx9VHllbfFdr9k1JA=="
+    }
+  },
   "workspace": {
     "dependencies": [
       "jsr:@std/assert@^1.0.8",
       "jsr:@std/expect@^1.0.8",
-      "jsr:@std/testing@^1.0.5"
+      "jsr:@std/testing@^1.0.5",
+      "npm:fast-xml-parser@^4.5.0"
     ]
   }
 }
