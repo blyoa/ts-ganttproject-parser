@@ -12,5 +12,15 @@
     ".": "./src/mod.ts",
     "./parser": "./src/parser/mod.ts",
     "./util": "./src/util/mod.ts"
+  },
+  "publish": {
+    "include": [
+      "LICENSE",
+      "README.md",
+      "src/**/*.ts"
+    ],
+    "exclude": [
+      "src/**/*_test.ts"
+    ]
   }
 }
