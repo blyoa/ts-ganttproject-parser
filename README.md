@@ -1,7 +1,8 @@
 # ts-ganttproject-parser
 
-A TypeScript library for parsing [GanttProject](https://www.ganttproject.biz/) (.gan) XML files. This library
-provides type-safe parsing task hierarchies in GanttProject files.
+A TypeScript library for parsing [GanttProject](https://www.ganttproject.biz/)
+(.gan) XML files. This library provides type-safe parsing task hierarchies in
+GanttProject files.
 
 ## Features
 
